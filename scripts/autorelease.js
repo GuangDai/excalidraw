@@ -15,10 +15,14 @@ const publish = () => {
   const tag = isPreview ? "preview" : "next";
 
   try {
+    execSync(`cat ${excalidrawPackage}`);
+    execSync(`echo ${pkg.name}`);
     execSync(`yarn  --frozen-lockfile`);
     execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
     execSync(`yarn run build:umd`, { cwd: excalidrawDir });
-    execSync(`yarn --cwd ${excalidrawDir} publish --tag ${tag}`);
+    execSync(`cd ${excalidrawDir}`);
+    execSync(`cp -r ${excalidrawDir} /home/runner/work/excalidraw/bin`);
+    // execSync(`yarn --cwd ${excalidrawDir} publish --tag ${tag}`);
     console.info(`Published ${pkg.name}@${tag}🎉`);
     core.setOutput(
       "result",
@@ -47,11 +51,11 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
       !filesToIgnoreRegex.test(file)
     );
   });
-  if (!excalidrawPackageFiles.length) {
-    console.info("Skipping release as no valid diff found");
-    core.setOutput("result", "Skipping release as no valid diff found");
-    process.exit(0);
-  }
+  // if (!excalidrawPackageFiles.length) {
+  //   console.info("Skipping release as no valid diff found");
+  //   core.setOutput("result", "Skipping release as no valid diff found");
+  //   process.exit(0);
+  // }
 
   // update package.json
   let version = `${pkg.version}-${getShortCommitHash()}`;
